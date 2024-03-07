@@ -1,0 +1,15 @@
+C:\Users\chris\OneDrive\Documents\Programming\WindowsTotalBuildAssistant\WindowsTotalBuildAssistant\bin\Release\WindowsTotalBuildAssistant.exe.config
+C:\Users\chris\OneDrive\Documents\Programming\WindowsTotalBuildAssistant\WindowsTotalBuildAssistant\bin\Release\WindowsTotalBuildAssistant.exe
+C:\Users\chris\OneDrive\Documents\Programming\WindowsTotalBuildAssistant\WindowsTotalBuildAssistant\bin\Release\WindowsTotalBuildAssistant.pdb
+C:\Users\chris\OneDrive\Documents\Programming\WindowsTotalBuildAssistant\WindowsTotalBuildAssistant\bin\Release\System.Management.Automation.dll
+C:\Users\chris\OneDrive\Documents\Programming\WindowsTotalBuildAssistant\WindowsTotalBuildAssistant\obj\Release\WindowsTotalBuildAssistant.csproj.AssemblyReference.cache
+C:\Users\chris\OneDrive\Documents\Programming\WindowsTotalBuildAssistant\WindowsTotalBuildAssistant\obj\Release\WindowsTotalBuildAssistant.csproj.SuggestedBindingRedirects.cache
+C:\Users\chris\OneDrive\Documents\Programming\WindowsTotalBuildAssistant\WindowsTotalBuildAssistant\obj\Release\Interop.WUApiLib.dll
+C:\Users\chris\OneDrive\Documents\Programming\WindowsTotalBuildAssistant\WindowsTotalBuildAssistant\obj\Release\WindowsTotalBuildAssistant.csproj.ResolveComReference.cache
+C:\Users\chris\OneDrive\Documents\Programming\WindowsTotalBuildAssistant\WindowsTotalBuildAssistant\obj\Release\WindowsTotalBuildAssistant.Form1.resources
+C:\Users\chris\OneDrive\Documents\Programming\WindowsTotalBuildAssistant\WindowsTotalBuildAssistant\obj\Release\WindowsTotalBuildAssistant.Properties.Resources.resources
+C:\Users\chris\OneDrive\Documents\Programming\WindowsTotalBuildAssistant\WindowsTotalBuildAssistant\obj\Release\WindowsTotalBuildAssistant.csproj.GenerateResource.cache
+C:\Users\chris\OneDrive\Documents\Programming\WindowsTotalBuildAssistant\WindowsTotalBuildAssistant\obj\Release\WindowsTotalBuildAssistant.csproj.CoreCompileInputs.cache
+C:\Users\chris\OneDrive\Documents\Programming\WindowsTotalBuildAssistant\WindowsTotalBuildAssistant\obj\Release\WindowsTotalBuildAssistant.csproj.CopyComplete
+C:\Users\chris\OneDrive\Documents\Programming\WindowsTotalBuildAssistant\WindowsTotalBuildAssistant\obj\Release\WindowsTotalBuildAssistant.exe
+C:\Users\chris\OneDrive\Documents\Programming\WindowsTotalBuildAssistant\WindowsTotalBuildAssistant\obj\Release\WindowsTotalBuildAssistant.pdb
