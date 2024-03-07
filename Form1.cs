@@ -157,13 +157,13 @@ namespace WindowsTotalBuildAssistant
                 if (item.ToString() != "Chrome")
                 {
                     string checkedItemText = item.ToString();
-                    string appPath = Path.Combine(Environment.CurrentDirectory, @"installers", checkedItemText);
+                    string appPath = Path.Combine(Environment.CurrentDirectory, @"installers", checkedItemText, "Install");
                     silentInstaller.DeployApplications(appPath);
                 }
                 else
                 {
                     string checkedItemText = item.ToString();
-                    string appPath = Path.Combine(Environment.CurrentDirectory, @"installers\Chrome.exe");
+                    string appPath = Path.Combine(Environment.CurrentDirectory, @"installers\ChromeInstall.exe");
                     Process.Start(appPath);
 
                 }
