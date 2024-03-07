@@ -30,6 +30,18 @@ namespace WindowsTotalBuildAssistant
             this.Text = "WTBA?";
         }
 
+        public void UpdateConsoleOutput(string text)
+        {
+            if (textBoxConsoleOutput.InvokeRequired)
+            {
+                textBoxConsoleOutput.Invoke(new Action<string>(UpdateConsoleOutput), text);
+            }
+            else
+            {
+                textBoxConsoleOutput.AppendText(text + Environment.NewLine);
+            }
+        }
+
         private void Form1_Load(object sender, EventArgs e)
         {
             Console.WriteLine("WTBA?");
@@ -126,8 +138,6 @@ namespace WindowsTotalBuildAssistant
 
         private void checkedListBox1_SelectedIndexChanged(object sender, EventArgs e)
         {
-
-            Console.WriteLine(e.ToString());
 
         }
 
@@ -226,6 +236,72 @@ namespace WindowsTotalBuildAssistant
         private void button2_Click_2(object sender, EventArgs e)
         {
             string appPath = Path.Combine(Environment.CurrentDirectory, @"utilities\Furmark");
+            Process.Start(appPath);
+        }
+
+        private void sfcscan_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                string appPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), @"Local\OneLaunch\unins000.exe");
+                Console.WriteLine(appPath);
+                Process.Start(appPath);
+            } catch (Exception ex)
+            {
+                Console.WriteLine("Could not find uninstaller");
+                Process.Start("control", "appwiz.cpl");
+            }
+        }
+
+        private void button3_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                // Specify the URL you want to open in Chrome
+                string url = "https://chromewebstore.google.com/detail/ublock-origin/cjpalhdlnbpafiamejdnhcphjbkeiagm";
+
+                // Specify the path to the Chrome executable
+                string chromePath = @"C:\Program Files (x86)\Google\Chrome\Application\chrome.exe"; // Adjust the path as needed
+
+                // Start Chrome process with the URL as an argument
+                Process.Start(chromePath, url);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"An error occurred: {ex.Message}");
+            }
+        }
+
+        private void button4_Click(object sender, EventArgs e)
+        {
+            Process.Start("control", "appwiz.cpl");
+        }
+
+        private void diskmark_Click(object sender, EventArgs e)
+        {
+            string appPath = Path.Combine(Environment.CurrentDirectory, @"utilities\CrystalDiskMark");
+            Process.Start(appPath);
+        }
+
+        private void label4_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void panel3_Paint(object sender, PaintEventArgs e)
+        {
+
+        }
+
+        private void cpuz_Click(object sender, EventArgs e)
+        {
+            string appPath = Path.Combine(Environment.CurrentDirectory, @"utilities\CPU-Z");
+            Process.Start(appPath);
+        }
+
+        private void DDU_Click(object sender, EventArgs e)
+        {
+            string appPath = Path.Combine(Environment.CurrentDirectory, @"utilities\Display Driver Uninstaller");
             Process.Start(appPath);
         }
     }

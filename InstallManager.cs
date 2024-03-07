@@ -7,6 +7,8 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 using System.Management.Automation;
+using System.Threading;
+using System.Windows.Forms;
 
 namespace SilentInstallation
 {
@@ -45,6 +47,7 @@ namespace SilentInstallation
 
         public void DeployApplications(string executableFilePath)
         {
+
             PowerShell powerShell = null;
             Console.WriteLine(" ");
             Console.WriteLine("Deploying application...");
@@ -92,6 +95,11 @@ namespace SilentInstallation
                     powerShell.Dispose();
             }
 
+
+
         }
+
+
+
     }
 }
