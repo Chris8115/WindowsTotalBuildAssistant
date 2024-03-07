@@ -56,7 +56,7 @@ namespace SilentInstallation
                     //here “executableFilePath” need to use in place of “  
                     //'C:\\ApplicationRepository\\FileZilla_3.14.1_win64-setup.exe'”  
                     //but I am using the path directly in the script.  
-                    powerShell.AddScript("$setup=Start-Process -Wait -FilePath " + executableFilePath + " -ArgumentList '/S' -PassThru");  
+                    powerShell.AddScript("$setup=Start-Process -Wait -FilePath " + executableFilePath + " -ArgumentList '/Silent /Install' -PassThru");  
 
 
                     Collection < PSObject > PSOutput = powerShell.Invoke(); foreach (PSObject outputItem in PSOutput)
