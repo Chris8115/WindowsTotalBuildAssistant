@@ -12,6 +12,8 @@ using SilentInstallation;
 using System.IO;
 using System.Diagnostics;
 using Microsoft.Win32;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement;
+using System.Runtime.InteropServices;
 
 namespace WindowsTotalBuildAssistant
 {
@@ -50,70 +52,65 @@ namespace WindowsTotalBuildAssistant
 
         private void button1_Click(object sender, EventArgs e)
         {
-            Console.WriteLine("You think they are hiding in the Windows updates?");
-            Console.WriteLine("(BTW this shit doesn't work yet)");
-
-
-            // Create a new instance of the UpdateSession
-            UpdateSession updateSession = new UpdateSession();
-
-            // Create a new instance of the UpdateSearcher
-            IUpdateSearcher updateSearcher = updateSession.CreateUpdateSearcher();
+            Console.WriteLine("Install Updates....");
 
             try
             {
-                Console.WriteLine("Searching for available updates...");
+                UpdateSession updateSession = new UpdateSession();
+                IUpdateSearcher updateSearcher = updateSession.CreateUpdateSearcher();
 
-                // Search for available updates
+                // Search for updates
+                updateSearcher.Online = true; // Search online
                 ISearchResult searchResult = updateSearcher.Search("IsInstalled=0");
 
-                // Check if updates are available
-                if (searchResult.Updates.Count > 0)
+                if (searchResult.Updates.Count == 0)
                 {
-                    Console.WriteLine("Updates found. Starting installation...");
+                    Console.WriteLine("No updates available.");
+                    return;
+                }
 
-                    // Iterate through the updates and print their names
-                    foreach (IUpdate update in searchResult.Updates)
-                    {
-                        Console.WriteLine("- " + update.Title);
-                    }
+                Console.WriteLine("Found " + searchResult.Updates.Count + " updates.");
 
-                    // Create a new instance of the UpdateInstaller
-                    //IUpdateInstaller updateInstaller = updateSession.CreateUpdateInstaller();
-                    IUpdateInstaller2 updateInstaller = new UpdateInstaller();
+                UpdateCollection updatesToDownload = new UpdateCollection();
 
+                // Add updates to the collection to be downloaded
+                foreach (IUpdate update in searchResult.Updates)
+                {
+                    updatesToDownload.Add(update);
+                }
 
-                    // Add all updates to the installer
-                    updateInstaller.Updates = searchResult.Updates;
+                // Create update downloader
+                UpdateDownloader updateDownloader = updateSession.CreateUpdateDownloader();
+                updateDownloader.Updates = updatesToDownload;
 
-                    // Perform the installation
-                    IInstallationResult installationResult = updateInstaller.Install();
+                // Download updates
+                Console.WriteLine("Downloading updates...");
+                IDownloadResult downloadResult = updateDownloader.Download();
 
-                    // Check the installation result
-                    if (installationResult.ResultCode == OperationResultCode.orcSucceeded)
-                    {
-                        Console.WriteLine("Updates installed successfully.");
-                    }
-                    else
-                    {
-                        Console.WriteLine($"Update installation failed. Result code: {installationResult.ResultCode}");
+                // Create update installer
+                UpdateInstaller updateInstaller = updateSession.CreateUpdateInstaller() as UpdateInstaller;
+                updateInstaller.Updates = updatesToDownload;
 
-                        // Specify the URI for Windows Update settings
-                        string windowsUpdateUri = "ms-settings:windowsupdate";
+                // Install updates
+                Console.WriteLine("Installing updates...");
+                IInstallationResult installationResult = updateInstaller.Install();
 
-                        // Use Process.Start to launch the URI
-                        Process.Start(windowsUpdateUri);
-                    }
+                // Check installation result
+                if (installationResult.ResultCode == OperationResultCode.orcSucceeded)
+                {
+                    Console.WriteLine("Updates installed successfully.");
                 }
                 else
                 {
-                    Console.WriteLine("No updates available.");
+                    Console.WriteLine("Failed to install updates. Error code: " + installationResult.ResultCode);
+                    Process.Start("ms-settings:windowsupdate");
                 }
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"An error occurred: {ex.Message}");
+                Console.WriteLine("Error: " + ex.Message);
             }
+
         }
 
         private void textBox1_TextChanged(object sender, EventArgs e)
@@ -154,19 +151,38 @@ namespace WindowsTotalBuildAssistant
 
             foreach (object item in applicationsCheckbox.CheckedItems)
             {
-                if (item.ToString() != "Chrome")
+                string checkedItemText;
+                string appPath;
+                switch (item.ToString())
                 {
-                    string checkedItemText = item.ToString();
-                    string appPath = Path.Combine(Environment.CurrentDirectory, @"installers", checkedItemText, "Install");
-                    silentInstaller.DeployApplications(appPath);
-                }
-                else
-                {
-                    string checkedItemText = item.ToString();
-                    string appPath = Path.Combine(Environment.CurrentDirectory, @"installers\ChromeInstall.exe");
-                    Process.Start(appPath);
+                    case "Chrome":
+                        checkedItemText = item.ToString();
+                        appPath = Path.Combine(Environment.CurrentDirectory, @"installers\ChromeInstall.exe");
+                        Process.Start(appPath);
+                        break;
+                    case "iTunes":
+                        checkedItemText = item.ToString();
+                        appPath = Path.Combine(Environment.CurrentDirectory, @"installers\iTunesInstall.exe");
+                        Process.Start(appPath);
+                        break;
+                    case "Geforce Drivers":
+                        checkedItemText = item.ToString();
+                        appPath = Path.Combine(Environment.CurrentDirectory, @"installers\NvidiaInstall.exe");
+                        Process.Start(appPath);
+                        break;
+                    case "Trend":
+                        checkedItemText = item.ToString();
+                        appPath = Path.Combine(Environment.CurrentDirectory, @"installers\TrendInstall.exe");
+                        Process.Start(appPath);
+                        break;
+                    default:
+                        checkedItemText = item.ToString();
+                        appPath = Path.Combine(Environment.CurrentDirectory, @"installers", checkedItemText + "Install");
+                        silentInstaller.DeployApplications(appPath);
+                        break;
 
                 }
+
             }
         }
 
@@ -176,25 +192,19 @@ namespace WindowsTotalBuildAssistant
             Process.Start(appPath);
         }
 
+        //RemoveUltraViewer
         private void chromebtn_Click(object sender, EventArgs e)
         {
             try
             {
-                // Specify the path to Chrome's executable
-                string chromePath = @"C:\Program Files\Google\Chrome\Application\chrome.exe";
-
-                // Set Chrome as the default browser
-                Registry.SetValue(@"HKEY_CURRENT_USER\Software\Microsoft\Windows\Shell\Associations\UrlAssociations\http\UserChoice", "Progid", "ChromeHTML", RegistryValueKind.String);
-                Registry.SetValue(@"HKEY_CURRENT_USER\Software\Microsoft\Windows\Shell\Associations\UrlAssociations\https\UserChoice", "Progid", "ChromeHTML", RegistryValueKind.String);
-
-                // Optional: Set Chrome's path as the default browser
-                Registry.SetValue(@"HKEY_CLASSES_ROOT\ChromeHTML\shell\open\command", "", "\"" + chromePath + "\" -- \"%1\"");
-
-                Console.WriteLine("Google Chrome set as the default browser.");
+                string appPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86), @"UltraViewer\unins000.exe");
+                Console.WriteLine(appPath);
+                Process.Start(appPath);
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"An error occurred: {ex.Message}");
+                Console.WriteLine("Could not find uninstaller");
+                Process.Start("control", "appwiz.cpl");
             }
         }
 
@@ -239,6 +249,7 @@ namespace WindowsTotalBuildAssistant
             Process.Start(appPath);
         }
 
+        //RemoveOneLaunch
         private void sfcscan_Click(object sender, EventArgs e)
         {
             try
@@ -257,14 +268,24 @@ namespace WindowsTotalBuildAssistant
         {
             try
             {
-                // Specify the URL you want to open in Chrome
                 string url = "https://chromewebstore.google.com/detail/ublock-origin/cjpalhdlnbpafiamejdnhcphjbkeiagm";
 
-                // Specify the path to the Chrome executable
-                string chromePath = @"C:\Program Files (x86)\Google\Chrome\Application\chrome.exe"; // Adjust the path as needed
+                string chromePath = @"C:\Program Files\Google\Chrome\Application\chrome.exe"; // For 64-bit systems
 
-                // Start Chrome process with the URL as an argument
-                Process.Start(chromePath, url);
+                if (!File.Exists(chromePath))
+                {
+                    // If Chrome isn't found in the Program Files directory, try Program Files (x86)
+                    chromePath = @"C:\Program Files (x86)\Google\Chrome\Application\chrome.exe"; // For 32-bit systems
+                }
+
+                if (File.Exists(chromePath))
+                {
+                    Process.Start(chromePath, url);
+                }
+                else
+                {
+                    Console.WriteLine("Chrome not found.");
+                }
             }
             catch (Exception ex)
             {
@@ -304,5 +325,36 @@ namespace WindowsTotalBuildAssistant
             string appPath = Path.Combine(Environment.CurrentDirectory, @"utilities\Display Driver Uninstaller");
             Process.Start(appPath);
         }
+
+        private void bitlockerOff_Click(object sender, EventArgs e)
+        {
+
+            try
+            {
+                // Create a new process
+                Process process = new Process();
+
+                process.StartInfo.FileName = "cmd.exe";
+                process.StartInfo.Arguments = "/C manage-bde -off C:";
+                process.StartInfo.UseShellExecute = false;
+                process.StartInfo.RedirectStandardOutput = true;
+                process.Start();
+
+                // Read the command output
+                string output = process.StandardOutput.ReadToEnd();
+
+                // Wait for the process to finish
+                process.WaitForExit();
+
+                // Display the command output
+                Console.WriteLine("Command output:");
+                Console.WriteLine(output);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"An error occurred: {ex.Message}");
+            }
+        }
+
     }
 }
