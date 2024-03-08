@@ -56,8 +56,7 @@ namespace SilentInstallation
             {
                 using (powerShell = PowerShell.Create())
                 {
-                    //here “executableFilePath” need to use in place of “  
-                    //'C:\\ApplicationRepository\\FileZilla_3.14.1_win64-setup.exe'”  
+                    
                     //but I am using the path directly in the script.  
                     powerShell.AddScript("$setup=Start-Process -Wait -FilePath " + executableFilePath + " -ArgumentList '/Silent /Install' -PassThru");  
 
