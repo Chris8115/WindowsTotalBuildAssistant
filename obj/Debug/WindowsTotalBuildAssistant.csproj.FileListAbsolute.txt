@@ -27,3 +27,4 @@ C:\Users\chris\Source\Repos\Chris8115\WindowsTotalBuildAssistant\obj\Debug\Windo
 C:\Users\chris\Source\Repos\Chris8115\WindowsTotalBuildAssistant\obj\Debug\WindowsT.D9C31972.Up2Date
 C:\Users\chris\Source\Repos\Chris8115\WindowsTotalBuildAssistant\obj\Debug\WindowsTotalBuildAssistant.exe
 C:\Users\chris\Source\Repos\Chris8115\WindowsTotalBuildAssistant\obj\Debug\WindowsTotalBuildAssistant.pdb
+C:\Users\chris\OneDrive\Documents\Programming\WindowsTotalBuildAssistant\WindowsTotalBuildAssistant\bin\Debug\Interop.WUApiLib.dll
