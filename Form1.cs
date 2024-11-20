@@ -50,17 +50,30 @@ namespace WindowsTotalBuildAssistant
 
         }
 
-        private void button1_Click(object sender, EventArgs e)
+        private async void button1_Click(object sender, EventArgs e)
         {
-            Console.WriteLine("Install Updates....");
+            Console.WriteLine("Checking for and installing updates...");
 
+            try
+            {
+                await Task.Run(() => CheckAndInstallUpdates());
+                Console.WriteLine("Update process completed.");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Error: " + ex.Message);
+            }
+        }
+
+        private void CheckAndInstallUpdates()
+        {
             try
             {
                 UpdateSession updateSession = new UpdateSession();
                 IUpdateSearcher updateSearcher = updateSession.CreateUpdateSearcher();
 
-                // Search for updates
-                updateSearcher.Online = true; // Search online
+                Console.WriteLine("Searching for updates...");
+                updateSearcher.Online = true; // Enable online search
                 ISearchResult searchResult = updateSearcher.Search("IsInstalled=0");
 
                 if (searchResult.Updates.Count == 0)
@@ -69,14 +82,14 @@ namespace WindowsTotalBuildAssistant
                     return;
                 }
 
-                Console.WriteLine("Found " + searchResult.Updates.Count + " updates.");
+                Console.WriteLine($"Found {searchResult.Updates.Count} updates.");
 
+                // Prepare updates to download
                 UpdateCollection updatesToDownload = new UpdateCollection();
-
-                // Add updates to the collection to be downloaded
                 foreach (IUpdate update in searchResult.Updates)
                 {
                     updatesToDownload.Add(update);
+                    Console.WriteLine($"Queued update: {update.Title}");
                 }
 
                 // Create update downloader
@@ -84,34 +97,56 @@ namespace WindowsTotalBuildAssistant
                 updateDownloader.Updates = updatesToDownload;
 
                 // Download updates
-                Console.WriteLine("Downloading updates...");
+                Console.WriteLine("Starting download...");
                 IDownloadResult downloadResult = updateDownloader.Download();
 
-                // Create update installer
+                if (downloadResult.ResultCode != OperationResultCode.orcSucceeded)
+                {
+                    Console.WriteLine("Download failed. Checking individual updates...");
+                    foreach (IUpdate update in updatesToDownload)
+                    {
+                        if (update.IsDownloaded)
+                        {
+                            Console.WriteLine($"Update downloaded successfully: {update.Title}");
+                        }
+                        else
+                        {
+                            Console.WriteLine($"Update failed to download: {update.Title}");
+                        }
+                    }
+                    return;
+                }
+
+                Console.WriteLine("All updates downloaded successfully.");
+
+                // Install updates
                 UpdateInstaller updateInstaller = updateSession.CreateUpdateInstaller() as UpdateInstaller;
                 updateInstaller.Updates = updatesToDownload;
 
-                // Install updates
                 Console.WriteLine("Installing updates...");
                 IInstallationResult installationResult = updateInstaller.Install();
 
-                // Check installation result
                 if (installationResult.ResultCode == OperationResultCode.orcSucceeded)
                 {
                     Console.WriteLine("Updates installed successfully.");
                 }
                 else
                 {
-                    Console.WriteLine("Failed to install updates. Error code: " + installationResult.ResultCode);
+                    Console.WriteLine($"Failed to install updates. Error code: {installationResult.ResultCode}");
                     Process.Start("ms-settings:windowsupdate");
                 }
             }
+            catch (COMException comEx)
+            {
+                Console.WriteLine($"COM error occurred: {comEx.Message} (HRESULT: {comEx.HResult:X})");
+            }
             catch (Exception ex)
             {
-                Console.WriteLine("Error: " + ex.Message);
+                Console.WriteLine($"An error occurred: {ex.Message}");
             }
-
         }
+
+
 
         private void textBox1_TextChanged(object sender, EventArgs e)
         {
@@ -138,51 +173,53 @@ namespace WindowsTotalBuildAssistant
 
         }
 
-        private void button2_Click(object sender, EventArgs e)
+        private async void button2_Click(object sender, EventArgs e)
         {
             Console.WriteLine("Installing selected applications...");
 
-            foreach (object item in applicationsCheckbox.CheckedItems)
-            {
-                string checkedItemText = item.ToString();
-                Console.WriteLine("Checked item: {0}", checkedItemText);
+            List<string> appsToInstall = applicationsCheckbox.CheckedItems.Cast<string>().ToList();
 
-            }
+            // Run the installation process on a background thread
+            await Task.Run(() => InstallApplications(appsToInstall));
 
-            foreach (object item in applicationsCheckbox.CheckedItems)
+            Console.WriteLine("Installation process completed.");
+        }
+
+        private void InstallApplications(List<string> applications)
+        {
+            foreach (string appName in applications)
             {
-                string checkedItemText;
                 string appPath;
-                switch (item.ToString())
+
+                switch (appName)
                 {
                     case "Chrome":
-                        checkedItemText = item.ToString();
                         appPath = Path.Combine(Environment.CurrentDirectory, @"installers\ChromeInstall.exe");
-                        Process.Start(appPath);
                         break;
                     case "iTunes":
-                        checkedItemText = item.ToString();
                         appPath = Path.Combine(Environment.CurrentDirectory, @"installers\iTunesInstall.exe");
-                        Process.Start(appPath);
                         break;
                     case "Geforce Drivers":
-                        checkedItemText = item.ToString();
                         appPath = Path.Combine(Environment.CurrentDirectory, @"installers\NvidiaInstall.exe");
-                        Process.Start(appPath);
                         break;
                     case "Trend":
-                        checkedItemText = item.ToString();
                         appPath = Path.Combine(Environment.CurrentDirectory, @"installers\TrendInstall.exe");
-                        Process.Start(appPath);
                         break;
                     default:
-                        checkedItemText = item.ToString();
-                        appPath = Path.Combine(Environment.CurrentDirectory, @"installers", checkedItemText + "Install");
-                        silentInstaller.DeployApplications(appPath);
+                        appPath = Path.Combine(Environment.CurrentDirectory, @"installers", appName + "Install");
                         break;
-
                 }
 
+                try
+                {
+                    Console.WriteLine($"Installing {appName}...");
+                    Process.Start(appPath)?.WaitForExit(); // Wait for the process to complete
+                    Console.WriteLine($"{appName} installed successfully.");
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Failed to install {appName}. Error: {ex.Message}");
+                }
             }
         }
 
@@ -245,7 +282,8 @@ namespace WindowsTotalBuildAssistant
 
         private void button2_Click_2(object sender, EventArgs e)
         {
-            string appPath = Path.Combine(Environment.CurrentDirectory, @"utilities\Furmark");
+            string appPath = Path.Combine(Environment.CurrentDirectory, @"utilities\FurMark\runFurmark");
+            Console.WriteLine("Opening FurMark");
             Process.Start(appPath);
         }
 
@@ -300,7 +338,7 @@ namespace WindowsTotalBuildAssistant
 
         private void diskmark_Click(object sender, EventArgs e)
         {
-            string appPath = Path.Combine(Environment.CurrentDirectory, @"utilities\CrystalDiskMark");
+            string appPath = Path.Combine(Environment.CurrentDirectory, @"utilities\CrystalDiskMark\DiskMark64");
             Process.Start(appPath);
         }
 
@@ -316,37 +354,22 @@ namespace WindowsTotalBuildAssistant
 
         private void cpuz_Click(object sender, EventArgs e)
         {
-            string appPath = Path.Combine(Environment.CurrentDirectory, @"utilities\CPU-Z");
+            string appPath = Path.Combine(Environment.CurrentDirectory, @"utilities\CPUZ\CPUZ");
             Process.Start(appPath);
         }
 
         private void DDU_Click(object sender, EventArgs e)
         {
-            string appPath = Path.Combine(Environment.CurrentDirectory, @"utilities\Display Driver Uninstaller");
+            string appPath = Path.Combine(Environment.CurrentDirectory, @"utilities\DDU\DDU");
             Process.Start(appPath);
         }
 
-        private void bitlockerOff_Click(object sender, EventArgs e)
+        private async void bitlockerOff_Click(object sender, EventArgs e)
         {
-
             try
             {
-                // Create a new process
-                Process process = new Process();
-
-                process.StartInfo.FileName = "cmd.exe";
-                process.StartInfo.Arguments = "/C manage-bde -off C:";
-                process.StartInfo.UseShellExecute = false;
-                process.StartInfo.RedirectStandardOutput = true;
-                process.Start();
-
-                // Read the command output
-                string output = process.StandardOutput.ReadToEnd();
-
-                // Wait for the process to finish
-                process.WaitForExit();
-
-                // Display the command output
+                Console.WriteLine("Disabling BitLocker...");
+                string output = await Task.Run(() => DisableBitLocker());
                 Console.WriteLine("Command output:");
                 Console.WriteLine(output);
             }
@@ -355,6 +378,80 @@ namespace WindowsTotalBuildAssistant
                 Console.WriteLine($"An error occurred: {ex.Message}");
             }
         }
+
+        private string DisableBitLocker()
+        {
+            try
+            {
+                // Create a new process
+                using (Process process = new Process())
+                {
+                    process.StartInfo.FileName = "cmd.exe";
+                    process.StartInfo.Arguments = "/C manage-bde -off C:";
+                    process.StartInfo.UseShellExecute = false;
+                    process.StartInfo.RedirectStandardOutput = true;
+                    process.Start();
+
+                    // Read the command output
+                    string output = process.StandardOutput.ReadToEnd();
+
+                    // Wait for the process to finish
+                    process.WaitForExit();
+
+                    return output;
+                }
+            }
+            catch (Exception ex)
+            {
+                return $"Error: {ex.Message}";
+            }
+        }
+
+        private async void button5_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                Console.WriteLine("Checking if processes are running...");
+
+                // List of processes to check
+                List<string> processesToCheck = new List<string> { "anydesk", "support.client" };
+
+                // Check processes on a background thread
+                var results = await Task.Run(() => CheckProcesses(processesToCheck));
+
+                // Display results
+                for (int i = 0; i < processesToCheck.Count; i++)
+                {
+                    string status = results[i] ? "Running" : "Not Running";
+                    Console.WriteLine($"{processesToCheck[i]}: {status}");
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"An error occurred: {ex.Message}");
+            }
+        }
+
+        private List<bool> CheckProcesses(List<string> processNames)
+        {
+            List<bool> results = new();
+            foreach (string name in processNames)
+            {
+                try
+                {
+                    // Check if the process is running
+                    bool isRunning = Process.GetProcessesByName(name).Length > 0;
+                    results.Add(isRunning);
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Error checking process '{name}': {ex.Message}");
+                    results.Add(false); // Assume not running in case of error
+                }
+            }
+            return results;
+        }
+
 
     }
 }

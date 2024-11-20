@@ -28,3 +28,4 @@ C:\Users\chris\Source\Repos\Chris8115\WindowsTotalBuildAssistant\obj\Debug\Windo
 C:\Users\chris\Source\Repos\Chris8115\WindowsTotalBuildAssistant\obj\Debug\WindowsTotalBuildAssistant.exe
 C:\Users\chris\Source\Repos\Chris8115\WindowsTotalBuildAssistant\obj\Debug\WindowsTotalBuildAssistant.pdb
 C:\Users\chris\OneDrive\Documents\Programming\WindowsTotalBuildAssistant\WindowsTotalBuildAssistant\bin\Debug\Interop.WUApiLib.dll
+C:\Users\chris\source\repos\Chris8115\WindowsTotalBuildAssistant\bin\Debug\Interop.WUApiLib.dll

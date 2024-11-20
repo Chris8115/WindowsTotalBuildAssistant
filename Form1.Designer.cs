@@ -50,6 +50,7 @@
             this.button4 = new System.Windows.Forms.Button();
             this.button3 = new System.Windows.Forms.Button();
             this.label4 = new System.Windows.Forms.Label();
+            this.button5 = new System.Windows.Forms.Button();
             this.panel1.SuspendLayout();
             this.panel2.SuspendLayout();
             this.panel3.SuspendLayout();
@@ -251,6 +252,7 @@
             // panel3
             // 
             this.panel3.BackColor = System.Drawing.Color.Orange;
+            this.panel3.Controls.Add(this.button5);
             this.panel3.Controls.Add(this.bitlockerOff);
             this.panel3.Controls.Add(this.button4);
             this.panel3.Controls.Add(this.button3);
@@ -305,6 +307,16 @@
             this.label4.Text = "Additional Shortcuts";
             this.label4.Click += new System.EventHandler(this.label4_Click);
             // 
+            // button5
+            // 
+            this.button5.Location = new System.Drawing.Point(15, 328);
+            this.button5.Name = "button5";
+            this.button5.Size = new System.Drawing.Size(250, 50);
+            this.button5.TabIndex = 8;
+            this.button5.Text = "Check Support.Client";
+            this.button5.UseVisualStyleBackColor = true;
+            this.button5.Click += new System.EventHandler(this.button5_Click);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
@@ -353,6 +365,7 @@
         private System.Windows.Forms.Button cpuz;
         private System.Windows.Forms.Button DDU;
         private System.Windows.Forms.Button bitlockerOff;
+        private System.Windows.Forms.Button button5;
     }
 }
 
